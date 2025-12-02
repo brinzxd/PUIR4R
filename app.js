@@ -12,16 +12,24 @@ const questionsContainer = document.getElementById('questions-container');
 const testForm           = document.getElementById('test-form');
 
 const resultPercentageEl = document.getElementById('result-percentage');
-const resultScoreEl      = document.getElementById('result-score');
-const resultWrongEl      = document.getElementById('result-wrong');
+const resultScoreEl      = document.getElementById('result-score'); // Теперь здесь "Набрано баллов"
+const resultWrongEl      = document.getElementById('result-wrong'); // Теперь здесь "Потеряно баллов"
+
+// Для изменения подписей в HTML (через JS, чтобы не менять HTML файл вручную)
+const labelScoreEl       = document.querySelector('.stat-card:nth-child(2) .stat-label');
+const labelWrongEl       = document.querySelector('.stat-card:nth-child(3) .stat-label');
 
 const cube               = document.getElementById('resultCube');
 const cubePercentFront   = document.getElementById('cube-percent-front');
 const cubePercentBottom  = document.getElementById('cube-percent-bottom');
 const cubePointsBack     = document.getElementById('cube-points-back');
-const cubeCorrectRight   = document.getElementById('cube-correct-right');
-const cubeWrongLeft      = document.getElementById('cube-wrong-left');
+const cubeCorrectRight   = document.getElementById('cube-correct-right'); // Здесь тоже будут баллы
+const cubeWrongLeft      = document.getElementById('cube-wrong-left');    // И здесь
 const cubeTotalTop       = document.getElementById('cube-total-top');
+
+// Тексты на гранях куба тоже меняем
+const cubeLabelRight     = document.querySelector('.face.right h2');
+const cubeLabelLeft      = document.querySelector('.face.left h2');
 
 const recommendationBlock = document.getElementById('recommendation-block');
 const recommendationText  = document.getElementById('recommendation-text');
@@ -59,6 +67,14 @@ function showResult() {
     screenHome.style.display   = 'none';
     screenTest.style.display   = 'none';
     screenResult.style.display = '';
+
+    // Обновляем подписи при показе результатов
+    if(labelScoreEl) labelScoreEl.textContent = 'Набрано баллов';
+    if(labelWrongEl) labelWrongEl.textContent = 'Потеряно баллов';
+
+    // Обновляем подписи на кубе
+    if(cubeLabelRight) cubeLabelRight.textContent = 'Баллы';
+    if(cubeLabelLeft)  cubeLabelLeft.textContent  = 'Потеряно';
 }
 
 // генерация списка тестов
@@ -139,42 +155,45 @@ testForm.addEventListener('submit', (e) => {
     if (currentTestId == null) return;
 
     const test = testData[currentTestId];
-    let totalScore = 0;
+    const formData = new FormData(testForm);
+
+    let totalScore    = 0;
+    let totalMax      = test.max_score || 0;
 
     test.questions.forEach((q) => {
-        const value = (new FormData(testForm)).get(`question_${q.id}`);
+        const value = formData.get(`question_${q.id}`);
         if (!value) return;
-        const opt = q.options[value];
+
+        const options = q.options || {};
+        const opt = options[value];
         let points = opt ? opt.points : 0;
+
         if (typeof points === 'string') {
             const parsed = parseInt(points, 10);
             points = isNaN(parsed) ? 0 : parsed;
         }
+
         totalScore += points;
     });
 
-    const totalMax = test.max_score || 0;
     const percentage = totalMax ? Math.round((totalScore / totalMax) * 100) : 0;
+    const lostPoints = Math.max(0, totalMax - totalScore);
 
-    // считаем количество правильных/неправильных примерно через очки:
-    // если у тебя есть другое правило – можно доработать.
-    const correctApprox = totalScore; // при 1 балл за ответ; при 2 – можешь изменить формулу
-    const wrongApprox   = test.questions.length - correctApprox;
-
-    renderResult(currentTestId, totalScore, totalMax, percentage, correctApprox, wrongApprox);
+    renderResult(currentTestId, totalScore, totalMax, percentage, lostPoints);
 });
 
 // рендер результата и рекомендаций
-function renderResult(testId, score, total, percentage, correct, wrong) {
+function renderResult(testId, score, total, percentage, lost) {
     resultPercentageEl.textContent = `${percentage}%`;
-    resultScoreEl.textContent      = correct;
-    resultWrongEl.textContent      = wrong;
+    resultScoreEl.textContent      = score; // Показываем баллы
+    resultWrongEl.textContent      = lost;  // Показываем потерянные баллы
 
     cubePercentFront.textContent  = `${percentage}%`;
     cubePercentBottom.textContent = `${percentage}%`;
     cubePointsBack.textContent    = `${score}/${total}`;
-    cubeCorrectRight.textContent  = correct;
-    cubeWrongLeft.textContent     = wrong;
+
+    cubeCorrectRight.textContent  = score; // На грани куба тоже баллы
+    cubeWrongLeft.textContent     = lost;  // И потерянные баллы
     cubeTotalTop.textContent      = total;
 
     const test = testData[testId];
@@ -203,7 +222,7 @@ function renderResult(testId, score, total, percentage, correct, wrong) {
     showResult();
 }
 
-// логика умного куба: авто + мышью
+// логика умного куба
 let isDragging = false;
 let isHovered  = false;
 let prevX = 0;
@@ -217,13 +236,11 @@ function resetCubeAutoAnimation() {
     isDragging = false;
 }
 
-// hover — остановить анимацию
 cube.parentElement.addEventListener('mouseenter', () => {
     isHovered = true;
     cube.style.animationPlayState = 'paused';
 });
 
-// leave — если не тянем, вернуть авто
 cube.parentElement.addEventListener('mouseleave', () => {
     isHovered = false;
     if (!isDragging) {
@@ -232,7 +249,6 @@ cube.parentElement.addEventListener('mouseleave', () => {
     }
 });
 
-// мышь
 cube.addEventListener('mousedown', (e) => {
     isDragging = true;
     prevX = e.clientX;
@@ -265,7 +281,6 @@ document.addEventListener('mousemove', (e) => {
     prevY = e.clientY;
 });
 
-// touch
 cube.addEventListener('touchstart', (e) => {
     isDragging = true;
     const t = e.touches[0];
@@ -299,6 +314,5 @@ cube.addEventListener('touchmove', (e) => {
     e.preventDefault();
 });
 
-// старт
 renderTestsList();
 showHome();
