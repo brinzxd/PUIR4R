@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>IT‑HR Knowledge Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+    <div class="container">
+        <a href="#" class="logo" id="logo-home">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                <path d="M16 8L24 20H8L16 8Z" fill="white" opacity="0.9"/>
+                <defs>
+                    <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                        <stop offset="0%" style="stop-color:#ff6b9d"/>
+                        <stop offset="100%" style="stop-color:#ffa06d"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span>Knowledge Hub</span>
+        </a>
+    </div>
+</nav>
+
+<main class="main-content">
+    <div class="container">
+
+        <!-- экран: список тестов -->
+        <section id="screen-home">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Проверьте свои знания</h1>
+                    <p class="hero-subtitle">Выберите тему для прохождения профессионального тестирования</p>
+                </div>
+            </div>
+
+            <div class="tests-grid" id="tests-list">
+                <!-- карточки тестов генерируются JS -->
+            </div>
+        </section>
+
+        <!-- экран: прохождение теста -->
+        <section id="screen-test" style="display:none;">
+            <div class="test-header">
+                <button class="back-button" id="btn-back-to-home">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M13 16L7 10L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Назад
+                </button>
+                <h1 class="test-title" id="test-title"></h1>
+            </div>
+
+            <form id="test-form" class="test-form">
+                <div id="questions-container">
+                    <!-- вопросы и варианты генерируются JS -->
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">
+                        <span>Завершить тест</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- экран: результат -->
+        <section id="screen-result" style="display:none;">
+            <div class="result-container">
+                <div class="result-header">
+                    <h1 class="result-title">Тест завершён!</h1>
+                    <p class="result-subtitle">Вот ваши результаты</p>
+                </div>
+
+                <div class="result-stats">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="3"/>
+                                <path d="M16 24L21 29L32 18" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-value" id="result-percentage">0%</div>
+                        <div class="stat-label">Общий результат</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="result-score">0</div>
+                        <div class="stat-label">Правильных ответов</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="result-wrong">0</div>
+                        <div class="stat-label">Неправильных ответов</div>
+                    </div>
+                </div>
+
+                <!-- твой умный куб -->
+                <div class="cube-container">
+                    <div class="cube" id="resultCube">
+                        <div class="face front">
+                            <h2>Результат</h2>
+                            <p id="cube-percent-front">0%</p>
+                        </div>
+                        <div class="face back">
+                            <h2>Баллы</h2>
+                            <p id="cube-points-back">0/0</p>
+                        </div>
+                        <div class="face right">
+                            <h2>Верно</h2>
+                            <p id="cube-correct-right">0</p>
+                        </div>
+                        <div class="face left">
+                            <h2>Ошибок</h2>
+                            <p id="cube-wrong-left">0</p>
+                        </div>
+                        <div class="face top">
+                            <h2>Всего</h2>
+                            <p id="cube-total-top">0</p>
+                        </div>
+                        <div class="face bottom">
+                            <h2>Процент</h2>
+                            <p id="cube-percent-bottom">0%</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="cube-hint">🎲 Наведи курсор чтобы управлять вращением</p>
+
+                <div class="recommendation-card" id="recommendation-block" style="display:none;">
+                    <div class="recommendation-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4L19.5 14.5L30 16L21 23L24 34L16 28L8 34L11 23L2 16L12.5 14.5L16 4Z" fill="url(#recGradient)"/>
+                            <defs>
+                                <linearGradient id="recGradient" x1="0" y1="0" x2="32" y2="32">
+                                    <stop offset="0%" style="stop-color:#ff6b9d"/>
+                                    <stop offset="100%" style="stop-color:#ffa06d"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h3 class="recommendation-title">Рекомендация</h3>
+                    <p class="recommendation-text" id="recommendation-text"></p>
+                </div>
+
+                <div class="result-actions">
+                    <button class="action-button secondary" id="btn-result-home">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 10H17M3 10L8 5M3 10L8 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        На главную
+                    </button>
+                    <button class="action-button primary" id="btn-result-retry">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10C4 10 6.5 4 10 4C13.5 4 16 10 16 10C16 10 13.5 16 10 16C6.5 16 4 10 4 10Z" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Пройти снова
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2025 Knowledge Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="test_data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
